@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0;
-
+import "hardhat/console.sol";
 contract Carpool{
 
     event Adduser(uint id,string Name,string phNo,uint age);
@@ -40,6 +40,7 @@ contract Carpool{
     uint price,uint seat) public
     {
         uint rideid = Ride.length;
+        console.log(rideid);
         Ride.push(CreateRide(rideid,_Destination,_source,price,seat));
         rideowner[rideid] = payable(msg.sender);
         emit AddRide(msg.sender,rideid);
