@@ -1,55 +1,59 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity >=0.7.0;
 import "hardhat/console.sol";
-contract Carpool{
 
-    event Adduser(uint id,string Name,string phNo,uint age);
-    event AddRide(address owner,uint rideid);
-    event BookRide(address user,address owner,uint rideid);
-    struct person{
+contract Carpool {
+    event AddUser(uint id, string name, string phNo, uint age);
+    event AddRide(uint rideId, string destination, string source, uint price, uint seat);
+    event BookRide(address user, address owner, uint rideId);
+
+    struct Person {
         uint id;
-        string  Name;
-        string  phNo;
-        uint  age;
+        string name;
+        string phNo;
+        uint age;
     }
 
-    struct CreateRide{
-        uint rideID;
-        string Destination;
+    struct CreateRide {
+        uint rideId;
+        string destination;
         string source;
         uint price;
         uint seat;
     }
 
-    person[] public User;
-    CreateRide[] public Ride;
-    mapping (uint => address payable) public rideowner;
-    mapping (address => person) public UserAddress;
-    function addUser(string memory _Name,string memory _phNo,uint _age) public
-    {
-        uint Id = User.length;
-        User.push(person(Id,_Name,_phNo,_age));
-        UserAddress[msg.sender].id = Id;
-        UserAddress[msg.sender].Name = _Name;
-        UserAddress[msg.sender].phNo = _phNo;
-        UserAddress[msg.sender].age = _age;
-        emit Adduser(Id,_Name,_phNo,_age);
+    Person[] public users;
+    CreateRide[] public rides;
+    mapping(uint => address payable) public rideOwner;
+    mapping(address => Person) public userAddress;
+
+    uint rideIdCounter;
+
+    function addUser(string memory name, string memory phNo, uint age) public {
+        uint id = users.length;
+        users.push(Person(id, name, phNo, age));
+        userAddress[msg.sender].id = id;
+        userAddress[msg.sender].name = name;
+        userAddress[msg.sender].phNo = phNo;
+        userAddress[msg.sender].age = age;
+        emit AddUser(id, name, phNo, age);
     }
 
-    function createRide(string memory _Destination,string memory _source,
-    uint price,uint seat) public
-    {
-        uint rideid = Ride.length;
-        console.log(rideid);
-        Ride.push(CreateRide(rideid,_Destination,_source,price,seat));
-        rideowner[rideid] = payable(msg.sender);
-        emit AddRide(msg.sender,rideid);
+    function createRide(string memory destination, string memory source, uint price, uint seat) public {
+        uint rideId = rideIdCounter++;
+        rides.push(CreateRide(rideId, destination, source, price, seat));
+        rideOwner[rideId] = payable(msg.sender);
+        emit AddRide(rideId, destination, source, price, seat);
     }
 
-    function bookRide(uint rideId,uint no_of_seat) payable public{
-        require(no_of_seat*(Ride[rideId].price) == msg.value);
-        rideowner[rideId].transfer(msg.value);
-        Ride[rideId].seat = Ride[rideId].seat -no_of_seat;
-        emit BookRide(msg.sender, rideowner[rideId], rideId);
+    function bookRide(uint rideId, uint no_of_seat) payable public {
+        require(no_of_seat * rides[rideId].price == msg.value);
+        rideOwner[rideId].transfer(msg.value);
+        rides[rideId].seat = rides[rideId].seat - no_of_seat;
+        emit BookRide(msg.sender, rideOwner[rideId], rideId);
+    }
+
+    function getRideDetails(uint rideId) public view returns (string memory, string memory, uint, uint) {
+        return (rides[rideId].destination, rides[rideId].source, rides[rideId].price, rides[rideId].seat);
     }
 }
