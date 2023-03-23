@@ -22,7 +22,7 @@ export const CreateRide = () => {
         setAccounts(accounts);
 
         // Load contract
-        const contractAddress = '0xc83458f11FD782Df6793605dD4EEEd28E026Dc16';
+        const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
         const contractABI = Contract.abi; // Your contract ABI
         const contract = new web3.eth.Contract(contractABI, contractAddress);
         setContract(contract);

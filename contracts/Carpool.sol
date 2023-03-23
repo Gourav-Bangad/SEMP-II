@@ -56,4 +56,8 @@ contract Carpool {
     function getRideDetails(uint rideId) public view returns (string memory, string memory, uint, uint) {
         return (rides[rideId].destination, rides[rideId].source, rides[rideId].price, rides[rideId].seat);
     }
+
+    function getAllRides() public view returns (CreateRide[] memory) {
+    return rides;
+    }
 }

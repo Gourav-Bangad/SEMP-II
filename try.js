@@ -342,7 +342,7 @@ async function createRide(destination, source, price, seat) {
     // const rideDetails = await carpoolContract.getRideDetails(rideId);
     // console.log("Ride ID:", rideId);
     // console.log("Ride Details:", rideDetails);
-    console.log(tx.log);
+    console.log(tx);
 }
 
 async function addUser(name,phNo,age) {
@@ -354,7 +354,7 @@ async function addUser(name,phNo,age) {
     console.log(tx);
 }
 
-addUser("Gourav","801010101",20);
+// addUser("Gourav","801010101",20);
 
-// createRide("N York", "Boston", 500, 3);
+createRide("Harvard", "Boston", 500, 3);
 

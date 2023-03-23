@@ -5,7 +5,8 @@ import { Signup} from './components/Signup';
 import { ConnectWallet} from './components/ConnectWallet';
 import  Navbar from './components/Navbar';
 import { Rides } from './components/Rides';
-import {BookRides, CreateRide} from './components/CreateRide'
+import {CreateRide} from './components/CreateRide';
+import {BookRide} from './components/BookRide';
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route exact path="/connectwallet" element={<ConnectWallet />}/>
           <Route exact path="/ride" element={<Rides />}/>
           <Route exact path="/createride" element={<CreateRide />}/>
+          <Route exact path="/bookride" element={<BookRide />}/>
         </Routes>
       </BrowserRouter>
     </div>
