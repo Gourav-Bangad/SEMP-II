@@ -1,13 +1,13 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import  Contract  from '../contracts/Carpool.sol/Carpool.json';
+import  Contract  from '../contracts/Carpool.sol/Carpool';
 
 export const CreateRide = () => {
   const [web3, setWeb3] = useState(null);
   const [accounts, setAccounts] = useState([]);
   const [contract, setContract] = useState(null);
-
+  
   useEffect(() => {
     async function connect() {
       // Check if Web3 is available
@@ -22,7 +22,7 @@ export const CreateRide = () => {
         setAccounts(accounts);
 
         // Load contract
-        const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+        const contractAddress = '0x2F5ac426AfE728c143A4276A97B239545E38BfA0';
         const contractABI = Contract.abi; // Your contract ABI
         const contract = new web3.eth.Contract(contractABI, contractAddress);
         setContract(contract);
@@ -41,6 +41,14 @@ export const CreateRide = () => {
   const handleCreateRide = async (event) => {
     event.preventDefault();
     await contract.methods.createRide(destination, source, price, seat).send({ from: accounts[0] });
+    try {
+      const res = await axios.post('http://localhost:4000/allride', { source, destination, seat ,price });
+      console.log(res.data);
+      // show success message to user and redirect to login page
+    } catch (err) {
+      console.log(err.response.data);
+      // show error message to user
+    }
   };
 
   return (

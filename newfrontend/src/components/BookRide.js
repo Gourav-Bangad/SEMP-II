@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
-import Contract from '../contracts/Carpool.sol/Carpool.json';
+import Contract from '../contracts/Carpool.sol/Carpool';
 
 export const BookRide = () => {
   const [web3, setWeb3] = useState(null);
-  const [accounts, setAccounts] = useState([]);
-  const [contract, setContract] = useState(null);
   const [rides, setRides] = useState([]);
   const [selectedRide, setSelectedRide] = useState(null);
-  const [seatsToBook, setSeatsToBook] = useState(1);
+  const [numSeats, setNumSeats] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     async function connect() {
@@ -19,20 +18,14 @@ export const BookRide = () => {
         await window.ethereum.enable();
         setWeb3(web3);
 
-        // Get accounts
-        const accounts = await web3.eth.getAccounts();
-        setAccounts(accounts);
-
         // Load contract
-        const contractAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3';
+        const contractAddress = '0x2F5ac426AfE728c143A4276A97B239545E38BfA0';
         const contractABI = Contract.abi; // Your contract ABI
         const contract = new web3.eth.Contract(contractABI, contractAddress);
-        setContract(contract);
 
         // Get all rides
-        const rides = await contract.methods.getAllRides().call();
-        console.log(rides);
-        setRides(rides);
+        const allRides = await contract.methods.getAllRides().call();
+        setRides(allRides);
       } else {
         alert('Please install MetaMask to use this application');
       }
@@ -40,50 +33,47 @@ export const BookRide = () => {
     connect();
   }, []);
 
-  const handleRideSelect = (event) => {
-    const rideId = parseInt(event.target.value);
-    const selectedRide = rides.find((ride) => ride.id === rideId);
-    setSelectedRide(selectedRide);
+  const handleNumSeatsChange = (event) => {
+    const numSeats = parseInt(event.target.value);
+    if (numSeats > 0) {
+      setNumSeats(numSeats);
+      setTotalPrice(numSeats * selectedRide.price);
+    }
   };
 
-  const handleSeatsToBookChange = (event) => {
-    setSeatsToBook(parseInt(event.target.value));
-  };
-
-  const handleBookRide = async (event) => {
-    event.preventDefault();
-    await contract.methods.bookRide(selectedRide.id, seatsToBook).send({ from: accounts[0], value: selectedRide.price * seatsToBook });
-    // Update the list of rides
-    const updatedRides = await contract.methods.getAllRides().call();
-    setRides(updatedRides);
-    setSelectedRide(null);
-    setSeatsToBook(1);
+  const handleBookRide = async () => {
+    const contract = new web3.eth.Contract(Contract.abi, '0x2F5ac426AfE728c143A4276A97B239545E38BfA0');
+    const accounts = await web3.eth.getAccounts();
+    await contract.methods.bookRide(selectedRide.rideId, numSeats).send({
+      from: accounts[0],
+      value: web3.utils.toWei(totalPrice.toString(), 'wei')
+    });
+    alert('Ride booked successfully!');
+    window.location.reload();
   };
 
   return (
     <div>
-      <h1>Book a Ride</h1>
-      {selectedRide ? (
-        <div>
-          <h2>{selectedRide.source} to {selectedRide.destination}</h2>
-          <p>Price: {selectedRide.price} Ether</p>
-          <form onSubmit={handleBookRide}>
-            <label>Seats to book:</label>
-            <input type="number" value={seatsToBook} onChange={handleSeatsToBookChange} />
-            <button type="submit">Book Ride</button>
-          </form>
-        </div>
-      ) : (
-        <div>
-          <p>Select a ride:</p>
-          <select onChange={handleRideSelect}>
-            <option value="">--Select a ride--</option>
-            {rides.map((ride) => (
-              <option key={ride.id} value={ride.id}>
-                {ride.source} to {ride.destination} ({ride.availableSeats} seats available)
-              </option>
-            ))}
-          </select>
+      <h1>All Rides</h1>
+      <div className="card-container">
+        {rides.map((ride) => (
+          <div className="card" key={ride.rideId}>
+            <h2>{ride.destination}</h2>
+            <p>Source: {ride.source}</p>
+            <p>Price: {ride.price}</p>
+            <p>Seats Available: {ride.seat}</p>
+            <button onClick={() => setSelectedRide(ride)}>Book Ride</button>
+          </div>
+        ))}
+      </div>
+      {selectedRide && (
+        <div className="book-ride-popup">
+          <h2>Book Ride - {selectedRide.destination}</h2>
+          <p>Price per seat: {selectedRide.price}</p>
+          <label htmlFor="num-seats-input">Number of seats:</label>
+          <input type="number" id="num-seats-input" value={numSeats} onChange={handleNumSeatsChange} />
+          <p>Total Price: {totalPrice}</p>
+          <button onClick={handleBookRide}>Confirm Booking</button>
         </div>
       )}
     </div>
