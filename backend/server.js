@@ -3,7 +3,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
-const Ride = require('./models/Details');
+
 const app = express()
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -30,10 +30,13 @@ app.post('/signup', async (req, res) => {
     try {
         const {name, email, password } = req.body;
     
+        // Check if user already exists with this email
         const existingUser = await User.findOne({ email });
         if (existingUser) {
         return res.status(400).json({ error: 'User already exists with this email' });
         }
+    
+        // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
     
@@ -64,20 +67,8 @@ try {
     if (!isPasswordCorrect) {
     return res.status(400).json({ error: 'Invalid credentials' });
     }
+
     res.status(200).json({ message: 'Logged in successfully' });
-} catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Server error' });
-}
-});
-const rideId = 2;
-app.post('/allride', async (req, res) => {
-try {
-    const { departure, arrival, no_of_seat,price_per_seat} = req.body;
-    const newRide = new User({rideId, departure, arrival,no_of_seat,price_per_seat});
-    await newride.save();
-    rideId++;
-    res.status(200).json({ message: 'Ride created   successfully' });
 } catch (error) {
     console.log(error);
     res.status(500).json({ error: 'Server error' });

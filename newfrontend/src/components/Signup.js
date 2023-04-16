@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+//import './signup.css';
 
 export const Signup = () => {
   const [name, setName] = useState('');
@@ -20,38 +21,48 @@ export const Signup = () => {
   };
 
   return (
-    <div>
-      <h2>Sign up</h2>
+    <div class="register-photo">
+<div class="form-container">
+<div class="image-holder1"></div>
+      
       <form onSubmit={handleSubmit}>
-        <div>
+      <h2 class="text-center"><strong>Create </strong>an account</h2>
+        <div class="form-group">
           <label htmlFor="name">Name:</label>
           <input
+           class="form-control"
             type="text"
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
         </div>
-        <div>
+        <div class="form-group">
           <label htmlFor="email">Email:</label>
           <input
+           class="form-control"
             type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        <div>
+        <div class="form-group">
           <label htmlFor="password">Password:</label>
           <input
+           class="form-control"
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
-        <button type="submit">Sign up</button>
+        <div class="form-group">
+        <button  type="submit">Sign up</button>
+        </div>
+        
       </form>
+    </div>
     </div>
   );
 };
