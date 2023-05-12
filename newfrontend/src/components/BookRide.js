@@ -78,6 +78,26 @@ export const BookRide = () => {
     }
     else{
       alert('Error');
+    }    
+  };
+  const handleButtonClick = () => {
+    var src_input = document.getElementById("source");
+    var source = src_input.value.toUpperCase();
+    var des_input = document.getElementById("destination");
+    var destination = des_input.value.toUpperCase();
+    var rides_div = document.querySelector(".row");
+    var rides = rides_div.querySelectorAll(".col-sm-4");
+  
+    for (var i = 0; i < rides.length; i++) {
+      var ride = rides[i];
+      var ride_src = ride.querySelector("p:nth-child(2)").textContent.toUpperCase();
+      var ride_dest = ride.querySelector("h2").textContent.toUpperCase();
+      
+      if (ride_src.indexOf(source) > -1 && ride_dest.indexOf(destination) > -1) {
+        ride.style.display = "";
+      } else {
+        ride.style.display = "none";
+      }
     }
   };
 
@@ -85,17 +105,27 @@ export const BookRide = () => {
 
     <div className="pcontainer">
       <h1 className='allrides'>All Rides</h1>
+      <div className="input-group" style={{paddingLeft: "150px", paddingRight: "150px", paddingTop: "35px"}}>
+        <input type="text" style={{height: "48.333334px"}} id="source" placeholder="Enter Source" className="form-control"/>
+        <input type="text" style={{height: "48.333334px"}} id="destination" placeholder="Enter Destination" className="form-control"/>
+        <button type="button" style={{marginTop: "0px"}} className="btn btn-success" id="btn-add" onClick={() =>handleButtonClick()}>Search</button>
+
+      </div>
       <div className="row">
         {rides.map((ride) => (
           <div className="col-sm-4" key={ride.rideId}>
+           {ride.seat > 0 ? (
             <div className="brcard">
               <h2>{ride.destination}</h2>
               <p>Source: {ride.source}</p>
               <p>Price: {ride.price}</p>
               <p>Seats Available: {ride.seat}</p>
-              <button className= "BR-button" onClick={() => {setSelectedRide(ride);
-              handleShow();}} >Book Ride</button>
+              <button className="BR-button" onClick={() => {
+                setSelectedRide(ride);
+                handleShow();
+              }}>Book Ride</button>
             </div>
+          ) : null}
           </div>
         ))}
       </div>
@@ -159,3 +189,7 @@ export const BookRide = () => {
     
   );
 };
+
+//
+//style="height: 48.333334px;"
+//style="margin-top: 0px;"
